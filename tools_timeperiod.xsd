@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://acrl.cis.fiu.edu/tools/timeperiod" xmlns="http://acrl.cis.fiu.edu/tools/timeperiod"
+	xmlns:tns="http://acrl.cis.fiu.edu/tools/timeperiod" 
+	elementFormDefault="qualified">
+
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en">
+			Common data types
+		</xsd:documentation>
+	</xsd:annotation>
+
+	<xsd:complexType name="TimePeriod">
+		<xsd:sequence>
+			<xsd:element minOccurs="1" maxOccurs="1" name="startTime"
+				type="xsd:dateTime" />
+			<xsd:element minOccurs="1" maxOccurs="1" name="endTime"
+				type="xsd:dateTime" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ScheduledEvent">
+		<xsd:sequence>
+			<xsd:element minOccurs="1" maxOccurs="1" name="timePeriod"
+				type="tns:TimePeriod" />
+			<xsd:element minOccurs="1" maxOccurs="1" name="schId"
+				type="xsd:string" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+</xsd:schema>

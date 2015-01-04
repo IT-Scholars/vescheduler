@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://acrl.cis.fiu.edu/tools/timeperiod" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://acrl.cis.fiu.edu/tools/timeperiod">
+    <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+			Common data types
+		</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType name="TimePeriod">
+        <xsd:sequence>
+            <xsd:element name="startTime" type="xsd:dateTime"/>
+            <xsd:element name="endTime" type="xsd:dateTime"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="ScheduledEvent">
+        <xsd:sequence>
+            <xsd:element name="timePeriod" type="tns:TimePeriod"/>
+            <xsd:element name="schId" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>

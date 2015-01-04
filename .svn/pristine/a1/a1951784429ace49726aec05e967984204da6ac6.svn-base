@@ -1,0 +1,94 @@
+<project name="VESchedulerClient" default="build" basedir=".">
+
+  <property environment="env" />
+
+  <property name="build.sysclasspath" value="last"/>
+  <property name="axis2Libs" value="${env.AXIS2_LIBS}"/>
+  <property name="axis2Home" value="${env.AXIS2_HOME}"/>
+  <property name="home" value="${env.HOME}"/>
+
+  <path id="classpath">
+    <pathelement path="." />
+    <fileset dir="${axis2Home}/lib">
+      <include name="*.jar" />
+    </fileset>
+    <fileset dir="lib">
+      <include name="*.jar" />
+    </fileset>
+    <pathelement location="." />
+  </path>
+
+  <target name="build" depends="deploy" />
+  <target name="client" depends="jar_client" />
+
+  <target name="deploy" depends="jar_server">
+    <copy file="lib/VEScheduler.jar"
+	  tofile="${axis2Home}/repository/services/VEScheduler.aar"
+	  overwrite="true"/>
+    <copy file="lib/VEScheduler.jar"
+	  tofile="${axis2Home}/lib/VEScheduler.jar"
+	  overwrite="true"/>
+    <copy file="vescheduler.conf"
+	  tofile="${home}/vescheduler.conf"
+	  overwrite="true"/>
+  </target>
+	
+	<target name="deployRemotely" depends="deploy">
+	    <scp file="${axis2Home}/repository/services/VEScheduler.aar"
+	  	  todir="portal:k4se*prt4l@ita-provisioner.cis.fiu.edu:/usr/local/axis2-1.5/repository/services/"/>
+	    <!-- scp file="lib/VEScheduler.jar"
+	  	  todir="portal:k4se*prt4l@ita-provisioner.cis.fiu.edu:/usr/local/axis2-1.5/lib"/ -->
+		<sshexec 
+			host="ita-provisioner.cis.fiu.edu"
+			username="portal"
+			password="k4se*prt4l"
+			command="cp /usr/local/axis2-1.5/repository/services/VEScheduler.aar /usr/local/axis2-1.5/lib/VEScheduler.jar"/>
+		<scp file="vescheduler.conf"
+	  	  todir="portal:k4se*prt4l@ita-provisioner.cis.fiu.edu:~/"/>
+	    <scp file="create_tables_4_vescheduler.sql"
+	  	  todir="portal:k4se*prt4l@ita-provisioner.cis.fiu.edu:~/"/>
+	</target>
+	
+  <target name="jar_client" depends="compile">
+    <jar
+       jarfile="lib/veclient.jar">
+      <fileset 
+	 dir="classes"
+	 includes="edu/fiu/cis/acrl/vescheduler/client/*"/>
+    </jar>
+  </target>
+
+  <target name="jar_server" depends="compile">
+    <copy toDir="classes/META-INF" failonerror="false">
+      <fileset dir="resources">
+        <include name="*.xml"/>
+        <include name="*.wsdl"/>
+        <include name="*.xsd"/>
+      </fileset>
+    </copy>
+    <jar destfile="lib/VEScheduler.jar">
+      <fileset dir="classes" includes="META-INF/*,
+      	edu/fiu/cis/acrl/tools/**/*,
+      	edu/fiu/cis/acrl/vescheduler/ws/**/*,
+      	edu/fiu/cis/acrl/vescheduler/server/**/*"/>
+    </jar>
+  </target>
+
+  
+  <target name="compile">
+    <mkdir dir="classes"/>
+    <javac
+       srcdir="src"
+       destdir="classes"
+       classpathref="classpath"
+    	debug="true"/>
+  </target>
+
+  <target name="clean">
+    <delete dir="classes"/>
+    <delete>
+      <fileset dir="lib" includes="**/*"/>
+    </delete>
+  </target>
+
+</project>

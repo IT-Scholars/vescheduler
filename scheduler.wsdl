@@ -1,0 +1,2125 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<wsdl:definitions 
+	name="VEScheduler"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+	xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" 
+	xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" 
+	xmlns:tns="http://acrl.cis.fiu.edu/vescheduler/ws" 
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" 
+	targetNamespace="http://acrl.cis.fiu.edu/vescheduler/ws" 
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:ve="http://acrl.cis.fiu.edu/vescheduler/ws/vetypes"
+	xmlns:ct="http://acrl.cis.fiu.edu/tools/timeperiod">
+
+
+  	<!-- ======= Type Definitions ======= -->
+	
+	<wsdl:types>
+   	<xsd:schema
+      	targetNamespace="http://acrl.cis.fiu.edu/vescheduler/ws"
+      	elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+   	<xsd:import
+		namespace="http://acrl.cis.fiu.edu/vescheduler/ws/vetypes"
+		schemaLocation="ve_types.xsd" />
+
+   	<xsd:import
+		namespace="http://acrl.cis.fiu.edu/tools/timeperiod"
+		schemaLocation="tools_timeperiod.xsd" />
+
+	<xsd:complexType name="Host">
+	<xsd:sequence>
+		<xsd:element minOccurs="0" maxOccurs="1" name="id" type="xsd:int" />
+		<xsd:element minOccurs="1" maxOccurs="1" name="name" type="xsd:string" />
+		<xsd:element minOccurs="1" maxOccurs="1" name="sshPort" type="xsd:int" />
+		<xsd:element minOccurs="1" maxOccurs="1" name="username" type="xsd:string" />
+		<xsd:element minOccurs="1" maxOccurs="1" name="password" type="xsd:string" />
+		<xsd:element minOccurs="1" maxOccurs="1" name="veNumCap" type="xsd:int" />
+		<xsd:element minOccurs="1" maxOccurs="1" name="veFirstFreePort" type="xsd:int" />
+		<xsd:element minOccurs="1" maxOccurs="1" name="vePortNum" type="xsd:int" />
+		<xsd:element minOccurs="1" maxOccurs="1" name="active" type="xsd:boolean" />
+		<xsd:element minOccurs="1" maxOccurs="1" name="newAssignment" type="xsd:boolean" />
+	</xsd:sequence>
+	</xsd:complexType>      
+
+	<xsd:complexType name="KServer">
+		<xsd:sequence>
+			<xsd:element maxOccurs="1" minOccurs="1" name="id" 
+				type="xsd:int" />
+			<xsd:element maxOccurs="1" minOccurs="1" name="name"
+				type="xsd:string" />
+			<xsd:element maxOccurs="1" minOccurs="1" name="httpPort"
+				type="xsd:int" />
+			<xsd:element maxOccurs="1" minOccurs="1" name="username"
+				type="xsd:string" />
+			<xsd:element maxOccurs="1" minOccurs="1" name="password"
+				type="xsd:string" />
+			<xsd:element maxOccurs="1" minOccurs="1" name="totalCap"
+				type="xsd:int" />
+			<xsd:element maxOccurs="1" minOccurs="1" name="activeCap"
+				type="xsd:int" />
+			<xsd:element maxOccurs="1" minOccurs="1" name="active"
+				type="xsd:boolean" />
+			<xsd:element maxOccurs="1" minOccurs="1" name="newAssignment"
+				type="xsd:boolean" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="Storage">
+	<xsd:sequence>
+		<xsd:element minOccurs="0" maxOccurs="1" name="id" type="xsd:int" />
+		<xsd:element minOccurs="1" maxOccurs="1" name="dirPath" type="xsd:string" />
+		<xsd:element minOccurs="1" maxOccurs="1" name="gbSize" type="xsd:int" />
+		<xsd:element minOccurs="1" maxOccurs="1" name="active" type="xsd:boolean" />
+	</xsd:sequence>
+	</xsd:complexType>      
+
+	<xsd:complexType name="HostStorage">
+	<xsd:sequence>
+		<xsd:element minOccurs="1" maxOccurs="1" name="hostId" type="xsd:int" />
+		<xsd:element minOccurs="1" maxOccurs="1" name="storageId" type="xsd:int" />
+		<xsd:element minOccurs="1" maxOccurs="1" name="preference" type="xsd:int" />
+		<xsd:element minOccurs="1" maxOccurs="1" name="active" type="xsd:boolean" />
+	</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:simpleType name="vmInsStatusType">
+	  <xsd:restriction base="xsd:string">
+	    <xsd:enumeration value="NOT_PROVISIONED"/>
+	    <xsd:enumeration value="PROVISIONING_AND_STARTING"/>
+	    <xsd:enumeration value="RUNNING"/>
+	    <xsd:enumeration value="PAUSING"/>
+	    <xsd:enumeration value="PAUSED"/>
+	    <xsd:enumeration value="STARTING"/>
+	    <xsd:enumeration value="DESTROYED"/>
+	  </xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:complexType name="VMInfo">
+		<xsd:sequence>
+			<xsd:element maxOccurs="1" minOccurs="1" name="id"
+				type="xsd:string" />
+			<xsd:element maxOccurs="1" minOccurs="1" name="veInsId"
+				type="xsd:string" />
+			<xsd:element maxOccurs="1" minOccurs="1" name="name"
+				type="xsd:string" />
+			<xsd:element maxOccurs="1" minOccurs="1" name="domain"
+				type="xsd:string" />
+			<xsd:element maxOccurs="1" minOccurs="1" name="os"
+				type="xsd:string" />
+			<xsd:element maxOccurs="1" minOccurs="1" name="internalAddress"
+				type="xsd:string" />
+			<xsd:element maxOccurs="1" minOccurs="1" name="accessAddress"
+				type="xsd:string" />
+			<xsd:element maxOccurs="1" minOccurs="1" name="accessPort"
+				type="xsd:int" />
+			<xsd:element maxOccurs="1" minOccurs="1" name="macAddress"
+				type="xsd:string" />
+			<xsd:element maxOccurs="1" minOccurs="1" name="status"
+				type="tns:vmInsStatusType" />
+			<xsd:element maxOccurs="1" minOccurs="1" name="lastCheckin"
+				type="xsd:dateTime" />
+			<xsd:element maxOccurs="1" minOccurs="1" name="appName"
+				type="xsd:string" />
+			<xsd:element maxOccurs="1" minOccurs="1" name="appDir"
+				type="xsd:string" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+   	<!-- Request and response types -->
+
+	<!-- Cleanup -->
+
+	<xsd:element name="DisableKaseyaAccountRequest">
+		<xsd:complexType>
+			<xsd:sequence>
+			    <xsd:element minOccurs="1" maxOccurs="1" name="username" 
+			    	type="xsd:string" />
+				<xsd:element maxOccurs="1" minOccurs="0" name="veInsId"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="DisableKaseyaAccountResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="1" minOccurs="1" name="success"
+					type="xsd:boolean" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="reason"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="DelKaseyaAccountRequest">
+		<xsd:complexType>
+			<xsd:sequence>
+			    <xsd:element minOccurs="1" maxOccurs="1" name="username" 
+			    	type="xsd:string" />
+				<xsd:element maxOccurs="1" minOccurs="0" name="veInsId"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="DelKaseyaAccountResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="1" minOccurs="1" name="success"
+					type="xsd:boolean" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="reason"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="DelKaseyaAccountsRequest">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="1" minOccurs="1" name="groupName"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="DelKaseyaAccountsResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="1" minOccurs="1" name="success"
+					type="xsd:boolean" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="reason"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<!-- Cleanup -->
+
+	<!-- Deva -->
+
+	<xsd:element name="RedistributeDevasEvenlyRequest">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="1" minOccurs="1" name="groupName"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="RedistributeDevasEvenlyResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="1" minOccurs="1" name="success"
+					type="xsd:boolean" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="reason"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="RefreshVMRequest">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="1" minOccurs="1" name="devaInsId"
+					type="xsd:string" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="vmName"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="RefreshVMResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="1" minOccurs="1" name="success"
+					type="xsd:boolean" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="reason"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="RunVMCmdRequest">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="1" minOccurs="1" name="devaInsId"
+					type="xsd:string" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="vmName"
+					type="xsd:string" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="cmdParam1"
+					type="xsd:string" />
+				<xsd:element maxOccurs="1" minOccurs="0" name="cmdParam2"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="RunVMCmdResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="1" minOccurs="1" name="returnValue"
+					type="xsd:string" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="success"
+					type="xsd:boolean" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="reason"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="DestroyDevaInsRequest">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="1" minOccurs="1" name="devaInsId"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="DestroyDevaInsResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="1" minOccurs="1" name="success"
+					type="xsd:boolean" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="reason"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="GetDevaInsInfoRequest">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="1" minOccurs="1" name="veInsId"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="GetDevaInsInfoResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="1" minOccurs="0" name="kserver"
+					type="tns:KServer" />
+				<xsd:element maxOccurs="unbounded" minOccurs="0" name="vmInfo"
+					type="tns:VMInfo" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="success"
+					type="xsd:boolean" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="reason"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="GetEndDate4CurrentDevaInsRequest">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="1" minOccurs="1" name="devaInsId"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="GetEndDate4CurrentDevaInsResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+			    <xsd:element maxOccurs="1" minOccurs="0" name="veInsSchId" 
+			    	type="xsd:string" />
+				<xsd:element maxOccurs="1" minOccurs="0" name="curDate"
+					type="xsd:dateTime" />
+				<xsd:element maxOccurs="1" minOccurs="0" name="endDate"
+					type="xsd:dateTime" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="success"
+					type="xsd:boolean" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="reason"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="GetVMInsInfoRequest">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="1" minOccurs="1" name="vmInsId"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="GetVMInsInfoResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="1" minOccurs="0" name="vmInfo"
+					type="tns:VMInfo" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="success"
+					type="xsd:boolean" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="reason"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<!-- -->
+			
+	<!-- Resource Reservation -->
+	
+	<xsd:element name="ReserveResourceRequest">
+		<xsd:complexType>
+			<xsd:sequence>
+	    		<xsd:element minOccurs="0" maxOccurs="1" name="ve" 
+	    			type="ve:VirtualEnvironmentType" />
+	    		<xsd:element minOccurs="1" maxOccurs="1" name="timePeriod" 
+	    			type="ct:TimePeriod" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="quota"
+					type="xsd:int" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="cancel"
+					type="xsd:boolean" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="ReserveResourceResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="1" minOccurs="1" name="success"
+					type="xsd:boolean" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="reason"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<!--  -->
+	
+	<xsd:element name="CheckinRequest">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element minOccurs="1" maxOccurs="1" name="macAddress"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="CheckinResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="1" minOccurs="1" name="firstTime"
+					type="xsd:boolean" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="success"
+					type="xsd:boolean" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="reason"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="GetVMMacRequest">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element minOccurs="1" maxOccurs="1" name="veInsId"
+					type="xsd:string" />
+				<xsd:element minOccurs="1" maxOccurs="1" name="vmName"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="GetVMMacResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="1" minOccurs="0" name="macAddress"
+					type="xsd:string" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="success"
+					type="xsd:boolean" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="reason"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="GetVEMacsRequest">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element minOccurs="1" maxOccurs="1" name="veInsId"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="GetVEMacsResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="unbounded" minOccurs="0" name="macAddress"
+					type="xsd:string" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="success"
+					type="xsd:boolean" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="reason"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="GetVEInsIdUsingMacRequest">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element minOccurs="1" maxOccurs="1" name="macAddress"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="GetVEInsIdUsingMacResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="1" minOccurs="0" name="veInsId"
+					type="xsd:string" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="success"
+					type="xsd:boolean" />
+				<xsd:element maxOccurs="1" minOccurs="1" name="reason"
+					type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+    <xsd:element name="ScheduleVERequest">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="1" maxOccurs="1" name="username" type="xsd:string" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="ve" type="ve:VirtualEnvironmentType" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="veInsId" type="xsd:string" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="timePeriod" type="ct:TimePeriod" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="store" type="xsd:boolean" />
+	</xsd:sequence>
+	</xsd:complexType> 
+   	</xsd:element>
+
+    <xsd:element name="ScheduleVEResponse">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="0" maxOccurs="1" name="schId" type="xsd:string" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+	</xsd:complexType> 
+  	</xsd:element>
+
+   	<xsd:element name="CancelScheduledVERequest">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="1" maxOccurs="1" name="schId" type="xsd:string" />
+	</xsd:sequence>
+	</xsd:complexType> 
+  	</xsd:element>
+
+   	<xsd:element name="CancelScheduledVEResponse">
+	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+		<xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+		</xsd:sequence>
+	</xsd:complexType> 
+   	</xsd:element>
+    
+   	<xsd:element name="DelVEInsRequest">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="1" maxOccurs="1" name="veInsId" type="xsd:string" />
+	</xsd:sequence>
+	</xsd:complexType> 
+  	</xsd:element>
+
+   	<xsd:element name="DelVEInsResponse">
+	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+		<xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+		</xsd:sequence>
+	</xsd:complexType> 
+   	</xsd:element>
+    
+   	<xsd:element name="ModifyScheduledVERequest">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="1" maxOccurs="1" name="schId" type="xsd:string" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="timePeriod" type="ct:TimePeriod" />
+	</xsd:sequence>
+	</xsd:complexType> 
+   	</xsd:element>
+
+   	<xsd:element name="ModifyScheduledVEResponse">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="0" maxOccurs="1" name="schId" type="xsd:string" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+	</xsd:complexType> 
+  	</xsd:element>
+
+   	<xsd:element name="GetVEAvailabilityRequest">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="0" maxOccurs="1" name="ve" type="ve:VirtualEnvironmentType" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="veInsId" type="xsd:string" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="timePeriod" type="ct:TimePeriod" />
+	</xsd:sequence>
+	</xsd:complexType> 
+   	</xsd:element>
+
+   	<xsd:element name="GetVEAvailabilityResponse">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="0" maxOccurs="unbounded" name="availabilityRange" type="ct:TimePeriod" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+	</xsd:complexType> 
+   	</xsd:element>
+
+   	<xsd:element name="GetVEUnavailabilityRequest">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="0" maxOccurs="1" name="ve" type="ve:VirtualEnvironmentType" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="id" type="xsd:string" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="timePeriod" type="ct:TimePeriod" />
+	</xsd:sequence>
+	</xsd:complexType> 
+   	</xsd:element>
+
+   	<xsd:element name="GetVEUnavailabilityResponse">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="0" maxOccurs="unbounded" name="unavailabilityRange" type="ct:TimePeriod" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+	</xsd:complexType> 
+   	</xsd:element>
+
+   	<xsd:element name="GetVEInsScheduleRequest">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="1" maxOccurs="1" name="veInsId" type="xsd:string" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="timePeriod" type="ct:TimePeriod" />
+	</xsd:sequence>
+	</xsd:complexType> 
+   	</xsd:element>
+
+   	<xsd:element name="GetVEInsScheduleResponse">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="0" maxOccurs="unbounded" name="schedule" type="ct:ScheduledEvent" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+	</xsd:complexType> 
+   	</xsd:element>
+
+   	<xsd:element name="GetVEInsCurScheduleRequest">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="1" maxOccurs="1" name="veInsId" type="xsd:string" />
+	</xsd:sequence>
+	</xsd:complexType> 
+   	</xsd:element>
+
+   	<xsd:element name="GetVEInsCurScheduleResponse">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="0" maxOccurs="1" name="schedule" type="ct:ScheduledEvent" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+	</xsd:complexType> 
+   	</xsd:element>
+
+   	<xsd:element name="GetVEInsScheduleBySchIdRequest">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="1" maxOccurs="1" name="veInsSchId" type="xsd:string" />
+	</xsd:sequence>
+	</xsd:complexType> 
+   	</xsd:element>
+
+   	<xsd:element name="GetVEInsScheduleBySchIdResponse">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="0" maxOccurs="1" name="schedule" type="ct:ScheduledEvent" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+	</xsd:complexType> 
+   	</xsd:element>
+
+	<xsd:element name="GetConfigurationResponse">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="1" maxOccurs="1" name="userTimePeriod" type="ct:TimePeriod" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="adminTimePeriod" type="ct:TimePeriod" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+	</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="SetConfigurationRequest">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="1" maxOccurs="1" name="userTimePeriod" type="ct:TimePeriod" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="adminTimePeriod" type="ct:TimePeriod" />
+	</xsd:sequence>
+	</xsd:complexType>
+	</xsd:element>
+    
+    <xsd:element name="SetConfigurationResponse">
+   	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+   	</xsd:complexType>
+    </xsd:element>
+   
+    <xsd:element name="GetHostRequest">
+  	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="1" maxOccurs="1" name="hostId" type="xsd:int" />
+	</xsd:sequence>
+  	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="GetHostResponse">
+  	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="0" maxOccurs="1" name="host" type="tns:Host" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+   	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="GetHostUsingNameRequest">
+  	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="1" maxOccurs="1" name="hostName" type="xsd:string" />
+	</xsd:sequence>
+  	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="GetHostUsingNameResponse">
+  	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="0" maxOccurs="1" name="host" type="tns:Host" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+   	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="GetHostListRequest">
+  	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="0" maxOccurs="1" name="active" type="xsd:boolean" />
+	</xsd:sequence>
+  	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="GetHostListResponse">
+   	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="0" maxOccurs="unbounded" name="host" type="tns:Host" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+  	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="SetHostRequest">
+  	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="1" maxOccurs="1" name="host" type="tns:Host" />
+	</xsd:sequence>
+  	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="SetHostResponse">
+  	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+   	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="DelHostRequest">
+   	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="1" maxOccurs="1" name="hostId" type="xsd:int" />
+	</xsd:sequence>
+   	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="DelHostResponse">
+   	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+  	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="AddHostRequest">
+   	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="1" maxOccurs="1" name="host" type="tns:Host" />
+	</xsd:sequence>
+  	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="AddHostResponse">
+  	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="0" maxOccurs="1" name="hostId" type="xsd:int" />
+		<xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+   	</xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="GetStorageRequest">
+  	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="1" maxOccurs="1" name="storageId" type="xsd:int" />
+	</xsd:sequence>
+  	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="GetStorageResponse">
+  	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="0" maxOccurs="1" name="storage" type="tns:Storage" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+   	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="GetStorageListRequest">
+  	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="0" maxOccurs="1" name="active" type="xsd:boolean" />
+	</xsd:sequence>
+  	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="GetStorageListResponse">
+   	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="0" maxOccurs="unbounded" name="storage" type="tns:Storage" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+  	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="SetStorageRequest">
+  	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="1" maxOccurs="1" name="storage" type="tns:Storage" />
+	</xsd:sequence>
+  	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="SetStorageResponse">
+  	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+   	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="DelStorageRequest">
+   	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="1" maxOccurs="1" name="storageId" type="xsd:int" />
+	</xsd:sequence>
+   	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="DelStorageResponse">
+   	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+  	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="AddStorageRequest">
+   	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="1" maxOccurs="1" name="storage" type="tns:Storage" />
+	</xsd:sequence>
+  	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="AddStorageResponse">
+  	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="0" maxOccurs="1" name="storageId" type="xsd:int" />
+		<xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+   	</xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="GetHostStorageRequest">
+  	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="1" maxOccurs="1" name="hostId" type="xsd:int" />
+		<xsd:element minOccurs="1" maxOccurs="1" name="StorageId" type="xsd:int" />
+	</xsd:sequence>
+  	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="GetHostStorageResponse">
+  	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="0" maxOccurs="1" name="hostStorage" type="tns:HostStorage" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+   	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="GetHostStorageListRequest">
+  	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="0" maxOccurs="1" name="hostId" type="xsd:int" />
+		<xsd:element minOccurs="0" maxOccurs="1" name="StorageId" type="xsd:int" />
+		<xsd:element minOccurs="0" maxOccurs="1" name="active" type="xsd:boolean" />
+	</xsd:sequence>
+  	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="GetHostStorageListResponse">
+   	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="0" maxOccurs="unbounded" name="hostStorage" type="tns:HostStorage" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+  	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="SetHostStorageRequest">
+  	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="1" maxOccurs="1" name="hostStorage" type="tns:HostStorage" />
+	</xsd:sequence>
+  	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="SetHostStorageResponse">
+  	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+   	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="DelHostStorageRequest">
+   	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="1" maxOccurs="1" name="hostId" type="xsd:int" />
+		<xsd:element minOccurs="1" maxOccurs="1" name="StorageId" type="xsd:int" />
+	</xsd:sequence>
+   	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="DelHostStorageResponse">
+   	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+  	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="AddHostStorageRequest">
+   	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="1" maxOccurs="1" name="hostStorage" type="tns:HostStorage" />
+	</xsd:sequence>
+  	</xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="AddHostStorageResponse">
+  	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+   	</xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="ScheduleHostMaintenanceRequest">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="1" maxOccurs="1" name="hostId" type="xsd:int" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="timePeriod" type="ct:TimePeriod" />
+	</xsd:sequence>
+	</xsd:complexType> 
+   	</xsd:element>
+
+    <xsd:element name="ScheduleHostMaintenanceResponse">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="0" maxOccurs="1" name="schId" type="xsd:string" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+	</xsd:complexType> 
+  	</xsd:element>
+
+   	<xsd:element name="CancelScheduledHostMaintenanceRequest">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="1" maxOccurs="1" name="schId" type="xsd:string" />
+	</xsd:sequence>
+	</xsd:complexType> 
+  	</xsd:element>
+
+   	<xsd:element name="CancelScheduledHostMaintenanceResponse">
+	<xsd:complexType>
+	<xsd:sequence>
+		<xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+		<xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+		</xsd:sequence>
+	</xsd:complexType> 
+   	</xsd:element>
+    
+   	<xsd:element name="ModifyScheduledHostMaintenanceRequest">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="1" maxOccurs="1" name="schId" type="xsd:string" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="timePeriod" type="ct:TimePeriod" />
+	</xsd:sequence>
+	</xsd:complexType> 
+   	</xsd:element>
+
+   	<xsd:element name="ModifyScheduledHostMaintenanceResponse">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="0" maxOccurs="1" name="schId" type="xsd:string" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+	</xsd:complexType> 
+  	</xsd:element>
+
+   	<xsd:element name="GetHostMaintenanceAvailabilityRequest">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="1" maxOccurs="1" name="hostId" type="xsd:int" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="timePeriod" type="ct:TimePeriod" />
+	</xsd:sequence>
+	</xsd:complexType> 
+   	</xsd:element>
+
+   	<xsd:element name="GetHostMaintenanceAvailabilityResponse">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="0" maxOccurs="unbounded" name="availabilityRange" type="ct:TimePeriod" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+	</xsd:complexType> 
+   	</xsd:element>
+
+   	<xsd:element name="GetHostMaintenanceUnavailabilityRequest">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="1" maxOccurs="1" name="hostId" type="xsd:int" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="timePeriod" type="ct:TimePeriod" />
+	</xsd:sequence>
+	</xsd:complexType> 
+   	</xsd:element>
+
+   	<xsd:element name="GetHostMaintenanceUnavailabilityResponse">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="0" maxOccurs="unbounded" name="unavailabilityRange" type="ct:TimePeriod" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+	</xsd:complexType> 
+   	</xsd:element>
+
+   	<xsd:element name="GetHostMaintenanceScheduleRequest">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="1" maxOccurs="1" name="hostId" type="xsd:int" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="timePeriod" type="ct:TimePeriod" />
+	</xsd:sequence>
+	</xsd:complexType> 
+   	</xsd:element>
+
+   	<xsd:element name="GetHostMaintenanceScheduleResponse">
+	<xsd:complexType>
+	<xsd:sequence>
+	    <xsd:element minOccurs="0" maxOccurs="unbounded" name="schedule" type="ct:ScheduledEvent" />
+	    <xsd:element minOccurs="1" maxOccurs="1" name="success" type="xsd:boolean" />
+	    <xsd:element minOccurs="0" maxOccurs="1" name="message" type="xsd:string" />
+	</xsd:sequence>
+	</xsd:complexType> 
+   	</xsd:element>
+
+    </xsd:schema>
+    
+  	</wsdl:types>
+
+  	<!-- ========= Messages  ========= -->
+
+	<!-- Cleanup -->
+
+	<wsdl:message name="DisableKaseyaAccountRequestMsg">
+	  <wsdl:part name="parameters" element="tns:DisableKaseyaAccountRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="DisableKaseyaAccountResponseMsg">
+	  <wsdl:part name="parameters" element="tns:DisableKaseyaAccountResponse" />
+	</wsdl:message>
+	
+	<wsdl:message name="DelKaseyaAccountRequestMsg">
+	  <wsdl:part name="parameters" element="tns:DelKaseyaAccountRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="DelKaseyaAccountResponseMsg">
+	  <wsdl:part name="parameters" element="tns:DelKaseyaAccountResponse" />
+	</wsdl:message>
+	
+	<wsdl:message name="DelKaseyaAccountsRequestMsg">
+	  <wsdl:part name="parameters" element="tns:DelKaseyaAccountsRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="DelKaseyaAccountsResponseMsg">
+	  <wsdl:part name="parameters" element="tns:DelKaseyaAccountsResponse" />
+	</wsdl:message>
+	
+	<!-- Cleanup -->
+
+	<!-- Deva -->
+	
+	<wsdl:message name="RedistributeDevasEvenlyRequestMsg">
+	  <wsdl:part name="parameters" element="tns:RedistributeDevasEvenlyRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="RedistributeDevasEvenlyResponseMsg">
+	  <wsdl:part name="parameters" element="tns:RedistributeDevasEvenlyResponse" />
+	</wsdl:message>
+	
+	<wsdl:message name="RefreshVMRequestMsg">
+	  <wsdl:part name="parameters" element="tns:RefreshVMRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="RefreshVMResponseMsg">
+	  <wsdl:part name="parameters" element="tns:RefreshVMResponse" />
+	</wsdl:message>
+	
+	<wsdl:message name="RunVMCmdRequestMsg">
+	  <wsdl:part name="parameters" element="tns:RunVMCmdRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="RunVMCmdResponseMsg">
+	  <wsdl:part name="parameters" element="tns:RunVMCmdResponse" />
+	</wsdl:message>
+	
+	<wsdl:message name="DestroyDevaInsRequestMsg">
+	  <wsdl:part name="parameters" element="tns:DestroyDevaInsRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="DestroyDevaInsResponseMsg">
+	  <wsdl:part name="parameters" element="tns:DestroyDevaInsResponse" />
+	</wsdl:message>
+	
+	<wsdl:message name="GetDevaInsInfoRequestMsg">
+	  <wsdl:part name="parameters" element="tns:GetDevaInsInfoRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="GetDevaInsInfoResponseMsg">
+	  <wsdl:part name="parameters" element="tns:GetDevaInsInfoResponse" />
+	</wsdl:message>
+	
+	<wsdl:message name="GetEndDate4CurrentDevaInsRequestMsg">
+	  <wsdl:part name="parameters" element="tns:GetEndDate4CurrentDevaInsRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="GetEndDate4CurrentDevaInsResponseMsg">
+	  <wsdl:part name="parameters" element="tns:GetEndDate4CurrentDevaInsResponse" />
+	</wsdl:message>
+	
+	<wsdl:message name="GetVMInsInfoRequestMsg">
+	  <wsdl:part name="parameters" element="tns:GetVMInsInfoRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="GetVMInsInfoResponseMsg">
+	  <wsdl:part name="parameters" element="tns:GetVMInsInfoResponse" />
+	</wsdl:message>
+	
+	<!--  -->
+	
+	<!-- Reserve Resource -->
+	
+	<wsdl:message name="ReserveResourceRequestMsg">
+	  <wsdl:part name="parameters" element="tns:ReserveResourceRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="ReserveResourceResponseMsg">
+	  <wsdl:part name="parameters" element="tns:ReserveResourceResponse" />
+	</wsdl:message>
+	
+	<!--  -->
+
+  	<wsdl:message name="CheckinRequestMsg">
+    	<wsdl:part name="parameters" element="tns:CheckinRequest" />
+  	</wsdl:message>
+
+	<wsdl:message name="CheckinResponseMsg">
+	  	<wsdl:part name="parameters" element="tns:CheckinResponse" />
+	</wsdl:message>
+	
+  	<wsdl:message name="GetVMMacRequestMsg">
+    	<wsdl:part name="parameters" element="tns:GetVMMacRequest" />
+  	</wsdl:message>
+
+	<wsdl:message name="GetVMMacResponseMsg">
+	  	<wsdl:part name="parameters" element="tns:GetVMMacResponse" />
+	</wsdl:message>
+	
+  	<wsdl:message name="GetVEMacsRequestMsg">
+    	<wsdl:part name="parameters" element="tns:GetVEMacsRequest" />
+  	</wsdl:message>
+
+	<wsdl:message name="GetVEMacsResponseMsg">
+	  	<wsdl:part name="parameters" element="tns:GetVEMacsResponse" />
+	</wsdl:message>
+	
+  	<wsdl:message name="GetVEInsIdUsingMacRequestMsg">
+    	<wsdl:part name="parameters" element="tns:GetVEInsIdUsingMacRequest" />
+  	</wsdl:message>
+
+	<wsdl:message name="GetVEInsIdUsingMacResponseMsg">
+	  	<wsdl:part name="parameters" element="tns:GetVEInsIdUsingMacResponse" />
+	</wsdl:message>
+	
+  	<wsdl:message name="ScheduleVERequestMsg">
+    	<wsdl:part name="parameters" element="tns:ScheduleVERequest" />
+  	</wsdl:message>
+
+	<wsdl:message name="ScheduleVEResponseMsg">
+	  	<wsdl:part name="parameters" element="tns:ScheduleVEResponse" />
+	</wsdl:message>
+	
+	<wsdl:message name="CancelScheduledVERequestMsg">
+	  	<wsdl:part name="parameters" element="tns:CancelScheduledVERequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="CancelScheduledVEResponseMsg">
+	  	<wsdl:part name="parameters" element="tns:CancelScheduledVEResponse" />
+	</wsdl:message>
+	
+	<wsdl:message name="DelVEInsRequestMsg">
+	  	<wsdl:part name="parameters" element="tns:DelVEInsRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="DelVEInsResponseMsg">
+	  	<wsdl:part name="parameters" element="tns:DelVEInsResponse" />
+	</wsdl:message>
+	
+	<wsdl:message name="ModifyScheduledVERequestMsg">
+	  	<wsdl:part name="parameters" element="tns:ModifyScheduledVERequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="ModifyScheduledVEResponseMsg">
+	  	<wsdl:part name="parameters" element="tns:ModifyScheduledVEResponse" />
+	</wsdl:message>
+	
+	<wsdl:message name="GetVEAvailabilityRequestMsg">
+	  	<wsdl:part name="parameters" element="tns:GetVEAvailabilityRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="GetVEAvailabilityResponseMsg">
+	  	<wsdl:part name="parameters" element="tns:GetVEAvailabilityResponse" />
+	</wsdl:message>
+	
+	<wsdl:message name="GetVEUnavailabilityRequestMsg">
+	  	<wsdl:part name="parameters" element="tns:GetVEUnavailabilityRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="GetVEUnavailabilityResponseMsg">
+	  	<wsdl:part name="parameters" element="tns:GetVEUnavailabilityResponse" />
+	</wsdl:message>
+	
+	<wsdl:message name="GetVEInsScheduleRequestMsg">
+	  	<wsdl:part name="parameters" element="tns:GetVEInsScheduleRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="GetVEInsScheduleResponseMsg">
+	  	<wsdl:part name="parameters" element="tns:GetVEInsScheduleResponse" />
+	</wsdl:message>
+
+	<wsdl:message name="GetVEInsCurScheduleRequestMsg">
+	  	<wsdl:part name="parameters" element="tns:GetVEInsCurScheduleRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="GetVEInsCurScheduleResponseMsg">
+	  	<wsdl:part name="parameters" element="tns:GetVEInsCurScheduleResponse" />
+	</wsdl:message>
+
+	<wsdl:message name="GetVEInsScheduleBySchIdRequestMsg">
+	  	<wsdl:part name="parameters" element="tns:GetVEInsScheduleBySchIdRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="GetVEInsScheduleBySchIdResponseMsg">
+	  	<wsdl:part name="parameters" element="tns:GetVEInsScheduleBySchIdResponse" />
+	</wsdl:message>
+
+	<wsdl:message name="GetConfigurationRequestMsg" />
+	
+	<wsdl:message name="GetConfigurationResponseMsg">
+		<wsdl:part name="parameters" element="tns:GetConfigurationResponse" />
+	</wsdl:message>
+	
+	<wsdl:message name="SetConfigurationRequestMsg">
+		<wsdl:part name="parameters" element="tns:SetConfigurationRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="SetConfigurationResponseMsg">
+		<wsdl:part name="parameters" element="tns:SetConfigurationResponse" />
+	</wsdl:message>
+
+	<wsdl:message name="GetHostRequestMsg">
+		<wsdl:part name="parameters" element="tns:GetHostRequest" />
+	</wsdl:message>
+
+	<wsdl:message name="GetHostResponseMsg">
+		<wsdl:part name="parameters" element="tns:GetHostResponse" />
+	</wsdl:message>
+
+	<wsdl:message name="GetHostUsingNameRequestMsg">
+		<wsdl:part name="parameters" element="tns:GetHostUsingNameRequest" />
+	</wsdl:message>
+
+	<wsdl:message name="GetHostUsingNameResponseMsg">
+		<wsdl:part name="parameters" element="tns:GetHostUsingNameResponse" />
+	</wsdl:message>
+
+	<wsdl:message name="GetHostListRequestMsg">
+		<wsdl:part name="parameters" element="tns:GetHostListRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="GetHostListResponseMsg">
+		<wsdl:part name="parameters" element="tns:GetHostListResponse" />
+	</wsdl:message>
+
+	<wsdl:message name="SetHostRequestMsg">
+		<wsdl:part name="parameters" element="tns:SetHostRequest" />
+	</wsdl:message>
+
+	<wsdl:message name="SetHostResponseMsg">
+		<wsdl:part name="parameters" element="tns:SetHostResponse" />
+	</wsdl:message>
+
+	<wsdl:message name="DelHostRequestMsg">
+		<wsdl:part name="parameters" element="tns:DelHostRequest" />
+	</wsdl:message>
+
+	<wsdl:message name="DelHostResponseMsg">
+		<wsdl:part name="parameters" element="tns:DelHostResponse" />
+	</wsdl:message>
+
+	<wsdl:message name="AddHostRequestMsg">
+		<wsdl:part name="parameters" element="tns:AddHostRequest" />
+	</wsdl:message>
+
+	<wsdl:message name="AddHostResponseMsg">
+		<wsdl:part name="parameters" element="tns:AddHostResponse" />
+	</wsdl:message>
+ 
+	<wsdl:message name="GetStorageRequestMsg">
+		<wsdl:part name="parameters" element="tns:GetStorageRequest" />
+	</wsdl:message>
+
+	<wsdl:message name="GetStorageResponseMsg">
+		<wsdl:part name="parameters" element="tns:GetStorageResponse" />
+	</wsdl:message>
+
+	<wsdl:message name="GetStorageListRequestMsg">
+		<wsdl:part name="parameters" element="tns:GetStorageListRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="GetStorageListResponseMsg">
+		<wsdl:part name="parameters" element="tns:GetStorageListResponse" />
+	</wsdl:message>
+
+	<wsdl:message name="SetStorageRequestMsg">
+		<wsdl:part name="parameters" element="tns:SetStorageRequest" />
+	</wsdl:message>
+
+	<wsdl:message name="SetStorageResponseMsg">
+		<wsdl:part name="parameters" element="tns:SetStorageResponse" />
+	</wsdl:message>
+
+	<wsdl:message name="DelStorageRequestMsg">
+		<wsdl:part name="parameters" element="tns:DelStorageRequest" />
+	</wsdl:message>
+
+	<wsdl:message name="DelStorageResponseMsg">
+		<wsdl:part name="parameters" element="tns:DelStorageResponse" />
+	</wsdl:message>
+
+	<wsdl:message name="AddStorageRequestMsg">
+		<wsdl:part name="parameters" element="tns:AddStorageRequest" />
+	</wsdl:message>
+
+	<wsdl:message name="AddStorageResponseMsg">
+		<wsdl:part name="parameters" element="tns:AddStorageResponse" />
+	</wsdl:message>
+ 
+	<wsdl:message name="GetHostStorageRequestMsg">
+		<wsdl:part name="parameters" element="tns:GetHostStorageRequest" />
+	</wsdl:message>
+
+	<wsdl:message name="GetHostStorageResponseMsg">
+		<wsdl:part name="parameters" element="tns:GetHostStorageResponse" />
+	</wsdl:message>
+
+	<wsdl:message name="GetHostStorageListRequestMsg">
+		<wsdl:part name="parameters" element="tns:GetHostStorageListRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="GetHostStorageListResponseMsg">
+		<wsdl:part name="parameters" element="tns:GetHostStorageListResponse" />
+	</wsdl:message>
+
+	<wsdl:message name="SetHostStorageRequestMsg">
+		<wsdl:part name="parameters" element="tns:SetHostStorageRequest" />
+	</wsdl:message>
+
+	<wsdl:message name="SetHostStorageResponseMsg">
+		<wsdl:part name="parameters" element="tns:SetHostStorageResponse" />
+	</wsdl:message>
+
+	<wsdl:message name="DelHostStorageRequestMsg">
+		<wsdl:part name="parameters" element="tns:DelHostStorageRequest" />
+	</wsdl:message>
+
+	<wsdl:message name="DelHostStorageResponseMsg">
+		<wsdl:part name="parameters" element="tns:DelHostStorageResponse" />
+	</wsdl:message>
+
+	<wsdl:message name="AddHostStorageRequestMsg">
+		<wsdl:part name="parameters" element="tns:AddHostStorageRequest" />
+	</wsdl:message>
+
+	<wsdl:message name="AddHostStorageResponseMsg">
+		<wsdl:part name="parameters" element="tns:AddHostStorageResponse" />
+	</wsdl:message>
+ 
+  	<wsdl:message name="ScheduleHostMaintenanceRequestMsg">
+    	<wsdl:part name="parameters" element="tns:ScheduleHostMaintenanceRequest" />
+  	</wsdl:message>
+
+	<wsdl:message name="ScheduleHostMaintenanceResponseMsg">
+	  	<wsdl:part name="parameters" element="tns:ScheduleHostMaintenanceResponse" />
+	</wsdl:message>
+	
+	<wsdl:message name="CancelScheduledHostMaintenanceRequestMsg">
+	  	<wsdl:part name="parameters" element="tns:CancelScheduledHostMaintenanceRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="CancelScheduledHostMaintenanceResponseMsg">
+	  	<wsdl:part name="parameters" element="tns:CancelScheduledHostMaintenanceResponse" />
+	</wsdl:message>
+	
+	<wsdl:message name="ModifyScheduledHostMaintenanceRequestMsg">
+	  	<wsdl:part name="parameters" element="tns:ModifyScheduledHostMaintenanceRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="ModifyScheduledHostMaintenanceResponseMsg">
+	  	<wsdl:part name="parameters" element="tns:ModifyScheduledHostMaintenanceResponse" />
+	</wsdl:message>
+	
+	<wsdl:message name="GetHostMaintenanceAvailabilityRequestMsg">
+	  	<wsdl:part name="parameters" element="tns:GetHostMaintenanceAvailabilityRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="GetHostMaintenanceAvailabilityResponseMsg">
+	  	<wsdl:part name="parameters" element="tns:GetHostMaintenanceAvailabilityResponse" />
+	</wsdl:message>
+	
+	<wsdl:message name="GetHostMaintenanceUnavailabilityRequestMsg">
+	  	<wsdl:part name="parameters" element="tns:GetHostMaintenanceUnavailabilityRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="GetHostMaintenanceUnavailabilityResponseMsg">
+	  	<wsdl:part name="parameters" element="tns:GetHostMaintenanceUnavailabilityResponse" />
+	</wsdl:message>
+	
+	<wsdl:message name="GetHostMaintenanceScheduleRequestMsg">
+	  	<wsdl:part name="parameters" element="tns:GetHostMaintenanceScheduleRequest" />
+	</wsdl:message>
+	
+	<wsdl:message name="GetHostMaintenanceScheduleResponseMsg">
+	  	<wsdl:part name="parameters" element="tns:GetHostMaintenanceScheduleResponse" />
+	</wsdl:message>
+
+  	<!-- ======== Port Types  ======== -->
+
+  	<wsdl:portType name="VEScheduler">
+
+	<!-- Cleanup -->
+
+	<wsdl:operation name="disableKaseyaAccount">
+		<wsdl:input name="DisableKaseyaAccountRequest" message="tns:DisableKaseyaAccountRequestMsg">
+		</wsdl:input>
+		<wsdl:output name="DisableKaseyaAccountResponse" message="tns:DisableKaseyaAccountResponseMsg">
+		</wsdl:output>
+	</wsdl:operation>
+
+	<wsdl:operation name="delKaseyaAccount">
+		<wsdl:input name="DelKaseyaAccountRequest" message="tns:DelKaseyaAccountRequestMsg">
+		</wsdl:input>
+		<wsdl:output name="DelKaseyaAccountResponse" message="tns:DelKaseyaAccountResponseMsg">
+		</wsdl:output>
+	</wsdl:operation>
+
+	<wsdl:operation name="delKaseyaAccounts">
+		<wsdl:input name="DelKaseyaAccountsRequest" message="tns:DelKaseyaAccountsRequestMsg">
+		</wsdl:input>
+		<wsdl:output name="DelKaseyaAccountsResponse" message="tns:DelKaseyaAccountsResponseMsg">
+		</wsdl:output>
+	</wsdl:operation>
+
+	<!-- Cleanup -->
+
+	<!-- Deva -->
+
+	<wsdl:operation name="redistributeDevasEvenly">
+		<wsdl:input name="RedistributeDevasEvenlyRequest" message="tns:RedistributeDevasEvenlyRequestMsg">
+		</wsdl:input>
+		<wsdl:output name="RedistributeDevasEvenlyResponse" message="tns:RedistributeDevasEvenlyResponseMsg">
+		</wsdl:output>
+	</wsdl:operation>
+
+	<wsdl:operation name="refreshVM">
+		<wsdl:input name="RefreshVMRequest" message="tns:RefreshVMRequestMsg">
+		</wsdl:input>
+		<wsdl:output name="RefreshVMResponse" message="tns:RefreshVMResponseMsg">
+		</wsdl:output>
+	</wsdl:operation>
+
+	<wsdl:operation name="runVMCmd">
+		<wsdl:input name="RunVMCmdRequest" message="tns:RunVMCmdRequestMsg">
+		</wsdl:input>
+		<wsdl:output name="RunVMCmdResponse" message="tns:RunVMCmdResponseMsg">
+		</wsdl:output>
+	</wsdl:operation>
+
+	<wsdl:operation name="destroyDevaIns">
+		<wsdl:input name="DestroyDevaInsRequest" message="tns:DestroyDevaInsRequestMsg">
+		</wsdl:input>
+		<wsdl:output name="DestroyDevaInsResponse" message="tns:DestroyDevaInsResponseMsg">
+		</wsdl:output>
+	</wsdl:operation>
+
+	<wsdl:operation name="getDevaInsInfo">
+		<wsdl:input name="GetDevaInsInfoRequest" message="tns:GetDevaInsInfoRequestMsg">
+		</wsdl:input>
+		<wsdl:output name="GetDevaInsInfoResponse" message="tns:GetDevaInsInfoResponseMsg">
+		</wsdl:output>
+	</wsdl:operation>
+
+	<wsdl:operation name="getEndDate4CurrentDevaIns">
+		<wsdl:input name="GetEndDate4CurrentDevaInsRequest" message="tns:GetEndDate4CurrentDevaInsRequestMsg">
+		</wsdl:input>
+		<wsdl:output name="GetEndDate4CurrentDevaInsResponse" message="tns:GetEndDate4CurrentDevaInsResponseMsg">
+		</wsdl:output>
+	</wsdl:operation>
+
+	<wsdl:operation name="getVMInsInfo">
+		<wsdl:input name="GetVMInsInfoRequest" message="tns:GetVMInsInfoRequestMsg">
+		</wsdl:input>
+		<wsdl:output name="GetVMInsInfoResponse" message="tns:GetVMInsInfoResponseMsg">
+		</wsdl:output>
+	</wsdl:operation>
+
+	<!-- -->
+		
+	<!-- Reserve Resource -->
+
+	<wsdl:operation name="reserveResource">
+		<wsdl:input name="ReserveResourceRequest" message="tns:ReserveResourceRequestMsg">
+		</wsdl:input>
+		<wsdl:output name="ReserveResourceResponse" message="tns:ReserveResourceResponseMsg">
+		</wsdl:output>
+	</wsdl:operation>
+
+	<!--  -->
+	
+    <wsdl:operation name="checkin">
+      	<wsdl:input name="CheckinRequest" message="tns:CheckinRequestMsg" />
+      	<wsdl:output name="CheckinResponse" message="tns:CheckinResponseMsg" />
+    </wsdl:operation>
+
+    <wsdl:operation name="getVMMac">
+      	<wsdl:input name="GetVMMacRequest" message="tns:GetVMMacRequestMsg" />
+      	<wsdl:output name="GetVMMacResponse" message="tns:GetVMMacResponseMsg" />
+    </wsdl:operation>
+
+    <wsdl:operation name="getVEMacs">
+      	<wsdl:input name="GetVEMacsRequest" message="tns:GetVEMacsRequestMsg" />
+      	<wsdl:output name="GetVEMacsResponse" message="tns:GetVEMacsResponseMsg" />
+    </wsdl:operation>
+
+    <wsdl:operation name="getVEInsIdUsingMac">
+      	<wsdl:input name="GetVEInsIdUsingMacRequest" message="tns:GetVEInsIdUsingMacRequestMsg" />
+      	<wsdl:output name="GetVEInsIdUsingMacResponse" message="tns:GetVEInsIdUsingMacResponseMsg" />
+    </wsdl:operation>
+
+    <wsdl:operation name="scheduleVE">
+      	<wsdl:input name="ScheduleVERequest" message="tns:ScheduleVERequestMsg" />
+      	<wsdl:output name="ScheduleVEResponse" message="tns:ScheduleVEResponseMsg" />
+    </wsdl:operation>
+
+    <wsdl:operation name="cancelScheduledVE">
+      	<wsdl:input name="CancelScheduledVERequest" message="tns:CancelScheduledVERequestMsg" />
+      	<wsdl:output name="CancelScheduledVEResponse" message="tns:CancelScheduledVEResponseMsg" />
+    </wsdl:operation>
+
+    <wsdl:operation name="delVEIns">
+      	<wsdl:input name="DelVEInsRequest" message="tns:DelVEInsRequestMsg" />
+      	<wsdl:output name="DelVEInsResponse" message="tns:DelVEInsResponseMsg" />
+    </wsdl:operation>
+
+    <wsdl:operation name="modifyScheduledVE">
+      	<wsdl:input name="ModifyScheduledVERequest" message="tns:ModifyScheduledVERequestMsg" />
+      	<wsdl:output name="ModifyScheduledVEResponse" message="tns:ModifyScheduledVEResponseMsg" />
+    </wsdl:operation>
+
+    <wsdl:operation name="getVEAvailability">
+      	<wsdl:input name="GetVEAvailabilityRequest" message="tns:GetVEAvailabilityRequestMsg" />
+      	<wsdl:output name="GetVEAvailabilityResponse" message="tns:GetVEAvailabilityResponseMsg" />
+    </wsdl:operation>
+
+    <wsdl:operation name="getVEUnavailability">
+      	<wsdl:input name="GetVEUnavailabilityRequest" message="tns:GetVEUnavailabilityRequestMsg" />
+      	<wsdl:output name="GetVEUnavailabilityResponse" message="tns:GetVEUnavailabilityResponseMsg" />
+    </wsdl:operation>
+
+    <wsdl:operation name="getVEInsSchedule">
+      	<wsdl:input name="GetVEInsScheduleRequest" message="tns:GetVEInsScheduleRequestMsg" />
+      	<wsdl:output name="GetVEInsScheduleResponse" message="tns:GetVEInsScheduleResponseMsg" />
+    </wsdl:operation>
+    
+    <wsdl:operation name="getVEInsCurSchedule">
+      	<wsdl:input name="GetVEInsCurScheduleRequest" message="tns:GetVEInsCurScheduleRequestMsg" />
+      	<wsdl:output name="GetVEInsCurScheduleResponse" message="tns:GetVEInsCurScheduleResponseMsg" />
+    </wsdl:operation>
+    
+    <wsdl:operation name="getVEInsScheduleBySchId">
+      	<wsdl:input name="GetVEInsScheduleBySchIdRequest" message="tns:GetVEInsScheduleBySchIdRequestMsg" />
+      	<wsdl:output name="GetVEInsScheduleBySchIdResponse" message="tns:GetVEInsScheduleBySchIdResponseMsg" />
+    </wsdl:operation>
+    
+	<wsdl:operation name="getConfiguration">
+		<wsdl:input name="GetConfigurationRequest" message="tns:GetConfigurationRequestMsg" />
+		<wsdl:output name="GetConfigurationResponse" message="tns:GetConfigurationResponseMsg" />
+	</wsdl:operation>
+  
+  	<wsdl:operation name="setConfiguration">
+  		<wsdl:input name="SetConfigurationRequest" message="tns:SetConfigurationRequestMsg" />
+  		<wsdl:output name="SetConfigurationResponse" message="tns:SetConfigurationResponseMsg" />
+  	</wsdl:operation>
+
+  	<wsdl:operation name="getHost">
+  		<wsdl:input name="GetHostRequest" message="tns:GetHostRequestMsg" />
+  		<wsdl:output name="GetHostResponse" message="tns:GetHostResponseMsg" />
+  	</wsdl:operation>
+ 
+  	<wsdl:operation name="getHostUsingName">
+  		<wsdl:input name="GetHostUsingNameRequest" message="tns:GetHostUsingNameRequestMsg" />
+  		<wsdl:output name="GetHostUsingNameResponse" message="tns:GetHostUsingNameResponseMsg" />
+  	</wsdl:operation>
+ 
+  	<wsdl:operation name="getHostList">
+  		<wsdl:input name="GetHostListRequest" message="tns:GetHostListRequestMsg" />
+  		<wsdl:output name="GetHostListResponse" message="tns:GetHostListResponseMsg" />
+  	</wsdl:operation>
+
+  	<wsdl:operation name="setHost">
+  		<wsdl:input name="SetHostRequest" message="tns:SetHostRequestMsg" />
+  		<wsdl:output name="SetHostResponse" message="tns:SetHostResponseMsg" />
+  	</wsdl:operation>
+  
+  	<wsdl:operation name="delHost">
+  		<wsdl:input name="DelHostRequest" message="tns:DelHostRequestMsg" />
+  		<wsdl:output name="DelHostResponse" message="tns:DelHostResponseMsg" />
+  	</wsdl:operation>
+  
+  	<wsdl:operation name="addHost">
+  		<wsdl:input name="AddHostRequest" message="tns:AddHostRequestMsg" />
+  		<wsdl:output name="AddHostResponse" message="tns:AddHostResponseMsg" />
+  	</wsdl:operation>
+  
+  	<wsdl:operation name="getStorage">
+  		<wsdl:input name="GetStorageRequest" message="tns:GetStorageRequestMsg" />
+  		<wsdl:output name="GetStorageResponse" message="tns:GetStorageResponseMsg" />
+  	</wsdl:operation>
+ 
+  	<wsdl:operation name="getStorageList">
+  		<wsdl:input name="GetStorageListRequest" message="tns:GetStorageListRequestMsg" />
+  		<wsdl:output name="GetStorageListResponse" message="tns:GetStorageListResponseMsg" />
+  	</wsdl:operation>
+
+  	<wsdl:operation name="setStorage">
+  		<wsdl:input name="SetStorageRequest" message="tns:SetStorageRequestMsg" />
+  		<wsdl:output name="SetStorageResponse" message="tns:SetStorageResponseMsg" />
+  	</wsdl:operation>
+  
+  	<wsdl:operation name="delStorage">
+  		<wsdl:input name="DelStorageRequest" message="tns:DelStorageRequestMsg" />
+  		<wsdl:output name="DelStorageResponse" message="tns:DelStorageResponseMsg" />
+  	</wsdl:operation>
+  
+  	<wsdl:operation name="addStorage">
+  		<wsdl:input name="AddStorageRequest" message="tns:AddStorageRequestMsg" />
+  		<wsdl:output name="AddStorageResponse" message="tns:AddStorageResponseMsg" />
+  	</wsdl:operation>
+  
+  	<wsdl:operation name="getHostStorage">
+  		<wsdl:input name="GetHostStorageRequest" message="tns:GetHostStorageRequestMsg" />
+  		<wsdl:output name="GetHostStorageResponse" message="tns:GetHostStorageResponseMsg" />
+  	</wsdl:operation>
+ 
+  	<wsdl:operation name="getHostStorageList">
+  		<wsdl:input name="GetHostStorageListRequest" message="tns:GetHostStorageListRequestMsg" />
+  		<wsdl:output name="GetHostStorageListResponse" message="tns:GetHostStorageListResponseMsg" />
+  	</wsdl:operation>
+
+  	<wsdl:operation name="setHostStorage">
+  		<wsdl:input name="SetHostStorageRequest" message="tns:SetHostStorageRequestMsg" />
+  		<wsdl:output name="SetHostStorageResponse" message="tns:SetHostStorageResponseMsg" />
+  	</wsdl:operation>
+  
+  	<wsdl:operation name="delHostStorage">
+  		<wsdl:input name="DelHostStorageRequest" message="tns:DelHostStorageRequestMsg" />
+  		<wsdl:output name="DelHostStorageResponse" message="tns:DelHostStorageResponseMsg" />
+  	</wsdl:operation>
+  
+  	<wsdl:operation name="addHostStorage">
+  		<wsdl:input name="AddHostStorageRequest" message="tns:AddHostStorageRequestMsg" />
+  		<wsdl:output name="AddHostStorageResponse" message="tns:AddHostStorageResponseMsg" />
+  	</wsdl:operation>
+  
+    <wsdl:operation name="scheduleHostMaintenance">
+      	<wsdl:input name="ScheduleHostMaintenanceRequest" message="tns:ScheduleHostMaintenanceRequestMsg" />
+      	<wsdl:output name="ScheduleHostMaintenanceResponse" message="tns:ScheduleHostMaintenanceResponseMsg" />
+    </wsdl:operation>
+
+    <wsdl:operation name="cancelScheduledHostMaintenance">
+      	<wsdl:input name="CancelScheduledHostMaintenanceRequest" message="tns:CancelScheduledHostMaintenanceRequestMsg" />
+      	<wsdl:output name="CancelScheduledHostMaintenanceResponse" message="tns:CancelScheduledHostMaintenanceResponseMsg" />
+    </wsdl:operation>
+
+    <wsdl:operation name="modifyScheduledHostMaintenance">
+      	<wsdl:input name="ModifyScheduledHostMaintenanceRequest" message="tns:ModifyScheduledHostMaintenanceRequestMsg" />
+      	<wsdl:output name="ModifyScheduledHostMaintenanceResponse" message="tns:ModifyScheduledHostMaintenanceResponseMsg" />
+    </wsdl:operation>
+
+    <wsdl:operation name="getHostMaintenanceAvailability">
+      	<wsdl:input name="GetHostMaintenanceAvailabilityRequest" message="tns:GetHostMaintenanceAvailabilityRequestMsg" />
+      	<wsdl:output name="GetHostMaintenanceAvailabilityResponse" message="tns:GetHostMaintenanceAvailabilityResponseMsg" />
+    </wsdl:operation>
+
+    <wsdl:operation name="getHostMaintenanceUnavailability">
+      	<wsdl:input name="GetHostMaintenanceUnavailabilityRequest" message="tns:GetHostMaintenanceUnavailabilityRequestMsg" />
+      	<wsdl:output name="GetHostMaintenanceUnavailabilityResponse" message="tns:GetHostMaintenanceUnavailabilityResponseMsg" />
+    </wsdl:operation>
+
+    <wsdl:operation name="getHostMaintenanceSchedule">
+      	<wsdl:input name="GetHostMaintenanceScheduleRequest" message="tns:GetHostMaintenanceScheduleRequestMsg" />
+      	<wsdl:output name="GetHostMaintenanceScheduleResponse" message="tns:GetHostMaintenanceScheduleResponseMsg" />
+    </wsdl:operation>
+    
+  	</wsdl:portType>
+
+  	<!-- ========= Bindings  ========= -->
+
+  	<wsdl:binding name="VESchedulerBinding" type="tns:VEScheduler">
+    
+    <soap:binding style="document"
+		transport="http://schemas.xmlsoap.org/soap/http" />
+
+	<!-- Cleanup -->
+
+	<wsdl:operation name="disableKaseyaAccount">
+		<soap:operation soapAction="disableKaseyaAccount" />
+		<wsdl:input name="DisableKaseyaAccountRequest">
+			<soap:body use="literal" />
+		</wsdl:input>
+		<wsdl:output name="DisableKaseyaAccountResponse">
+			<soap:body use="literal" />
+		</wsdl:output>
+	</wsdl:operation>
+
+	<wsdl:operation name="delKaseyaAccount">
+		<soap:operation soapAction="delKaseyaAccount" />
+		<wsdl:input name="DelKaseyaAccountRequest">
+			<soap:body use="literal" />
+		</wsdl:input>
+		<wsdl:output name="DelKaseyaAccountResponse">
+			<soap:body use="literal" />
+		</wsdl:output>
+	</wsdl:operation>
+
+	<wsdl:operation name="delKaseyaAccounts">
+		<soap:operation soapAction="delKaseyaAccounts" />
+		<wsdl:input name="DelKaseyaAccountsRequest">
+			<soap:body use="literal" />
+		</wsdl:input>
+		<wsdl:output name="DelKaseyaAccountsResponse">
+			<soap:body use="literal" />
+		</wsdl:output>
+	</wsdl:operation>
+
+	<!-- Cleanup -->
+
+	<!-- Deva -->
+	
+	<wsdl:operation name="redistributeDevasEvenly">
+		<soap:operation soapAction="redistributeDevasEvenly" />
+		<wsdl:input name="RedistributeDevasEvenlyRequest">
+			<soap:body use="literal" />
+		</wsdl:input>
+		<wsdl:output name="RedistributeDevasEvenlyResponse">
+			<soap:body use="literal" />
+		</wsdl:output>
+	</wsdl:operation>
+
+	<wsdl:operation name="refreshVM">
+		<soap:operation soapAction="refreshVM" />
+		<wsdl:input name="RefreshVMRequest">
+			<soap:body use="literal" />
+		</wsdl:input>
+		<wsdl:output name="RefreshVMResponse">
+			<soap:body use="literal" />
+		</wsdl:output>
+	</wsdl:operation>
+
+	<wsdl:operation name="runVMCmd">
+		<soap:operation soapAction="runVMCmd" />
+		<wsdl:input name="RunVMCmdRequest">
+			<soap:body use="literal" />
+		</wsdl:input>
+		<wsdl:output name="RunVMCmdResponse">
+			<soap:body use="literal" />
+		</wsdl:output>
+	</wsdl:operation>
+
+	<wsdl:operation name="destroyDevaIns">
+		<soap:operation soapAction="destroyDevaIns" />
+		<wsdl:input name="DestroyDevaInsRequest">
+			<soap:body use="literal" />
+		</wsdl:input>
+		<wsdl:output name="DestroyDevaInsResponse">
+			<soap:body use="literal" />
+		</wsdl:output>
+	</wsdl:operation>
+
+	<wsdl:operation name="getDevaInsInfo">
+		<soap:operation soapAction="getDevaInsInfo" />
+		<wsdl:input name="GetDevaInsInfoRequest">
+			<soap:body use="literal" />
+		</wsdl:input>
+		<wsdl:output name="GetDevaInsInfoResponse">
+			<soap:body use="literal" />
+		</wsdl:output>
+	</wsdl:operation>
+
+	<wsdl:operation name="getEndDate4CurrentDevaIns">
+		<soap:operation soapAction="getEndDate4CurrentDevaIns" />
+		<wsdl:input name="GetEndDate4CurrentDevaInsRequest">
+			<soap:body use="literal" />
+		</wsdl:input>
+		<wsdl:output name="GetEndDate4CurrentDevaInsResponse">
+			<soap:body use="literal" />
+		</wsdl:output>
+	</wsdl:operation>
+
+	<wsdl:operation name="getVMInsInfo">
+		<soap:operation soapAction="getVMInsInfo" />
+		<wsdl:input name="GetVMInsInfoRequest">
+			<soap:body use="literal" />
+		</wsdl:input>
+		<wsdl:output name="GetVMInsInfoResponse">
+			<soap:body use="literal" />
+		</wsdl:output>
+	</wsdl:operation>
+
+	<!-- -->
+		
+	<!-- Reserver Resource -->
+	
+	<wsdl:operation name="reserveResource">
+		<soap:operation soapAction="reserveResource" />
+		<wsdl:input name="ReserveResourceRequest">
+			<soap:body use="literal" />
+		</wsdl:input>
+		<wsdl:output name="ReserveResourceResponse">
+			<soap:body use="literal" />
+		</wsdl:output>
+	</wsdl:operation>
+
+	<!--  -->
+	
+   <wsdl:operation name="checkin">
+      	<soap:operation soapAction="checkin" />
+      	<wsdl:input name="CheckinRequest"><soap:body use="literal" /></wsdl:input>
+      	<wsdl:output name="CheckinResponse"><soap:body use="literal" /></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="getVMMac">
+      	<soap:operation soapAction="getVMMac" />
+      	<wsdl:input name="GetVMMacRequest"><soap:body use="literal" /></wsdl:input>
+      	<wsdl:output name="GetVMMacResponse"><soap:body use="literal" /></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="getVEMacs">
+      	<soap:operation soapAction="getVEMacs" />
+      	<wsdl:input name="GetVEMacsRequest"><soap:body use="literal" /></wsdl:input>
+      	<wsdl:output name="GetVEMacsResponse"><soap:body use="literal" /></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="getVEInsIdUsingMac">
+      	<soap:operation soapAction="getVEInsIdUsingMac" />
+      	<wsdl:input name="GetVEInsIdUsingMacRequest"><soap:body use="literal" /></wsdl:input>
+      	<wsdl:output name="GetVEInsIdUsingMacResponse"><soap:body use="literal" /></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="scheduleVE">
+      	<soap:operation soapAction="scheduleVE" />
+      	<wsdl:input name="ScheduleVERequest"><soap:body use="literal" /></wsdl:input>
+      	<wsdl:output name="ScheduleVEResponse"><soap:body use="literal" /></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="cancelScheduledVE">
+      	<soap:operation soapAction="cancelScheduledVE" />
+      	<wsdl:input name="CancelScheduledVERequest"><soap:body use="literal" /></wsdl:input>
+      	<wsdl:output name="CancelScheduledVEResponse"><soap:body use="literal" /></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="delVEIns">
+      	<soap:operation soapAction="delVEIns" />
+      	<wsdl:input name="DelVEInsRequest"><soap:body use="literal" /></wsdl:input>
+      	<wsdl:output name="DelVEInsResponse"><soap:body use="literal" /></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="modifyScheduledVE">
+      	<soap:operation soapAction="modifyScheduledVE" />
+      	<wsdl:input name="ModifyScheduledVERequest"><soap:body use="literal" /></wsdl:input>
+      	<wsdl:output name="ModifyScheduledVEResponse"><soap:body use="literal" /></wsdl:output>
+    </wsdl:operation>
+    
+    <wsdl:operation name="getVEAvailability">
+      	<soap:operation soapAction="getVEAvailability" />
+      	<wsdl:input name="GetVEAvailabilityRequest"><soap:body use="literal" /></wsdl:input>
+      	<wsdl:output name="GetVEAvailabilityResponse"><soap:body use="literal" /></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="getVEUnavailability">
+      	<soap:operation soapAction="getVEUnavailability" />
+      	<wsdl:input name="GetVEUnavailabilityRequest"><soap:body use="literal" /></wsdl:input>
+      	<wsdl:output name="GetVEUnavailabilityResponse"><soap:body use="literal" /></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="getVEInsSchedule">
+      	<soap:operation soapAction="getVEInsSchedule" />
+      	<wsdl:input name="GetVEInsScheduleRequest"><soap:body use="literal" /></wsdl:input>
+      	<wsdl:output name="GetVEInsScheduleResponse"><soap:body use="literal" /></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="getVEInsCurSchedule">
+      	<soap:operation soapAction="getVEInsCurSchedule" />
+      	<wsdl:input name="GetVEInsCurScheduleRequest"><soap:body use="literal" /></wsdl:input>
+      	<wsdl:output name="GetVEInsCurScheduleResponse"><soap:body use="literal" /></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="getVEInsScheduleBySchId">
+      	<soap:operation soapAction="getVEInsScheduleBySchId" />
+      	<wsdl:input name="GetVEInsScheduleBySchIdRequest"><soap:body use="literal" /></wsdl:input>
+      	<wsdl:output name="GetVEInsScheduleBySchIdResponse"><soap:body use="literal" /></wsdl:output>
+    </wsdl:operation>
+
+	<wsdl:operation name="getConfiguration">
+		<soap:operation soapAction="getConfiguration" />
+		<wsdl:input name="GetConfigurationRequest"><soap:body use="literal" /></wsdl:input>
+		<wsdl:output name="GetConfigurationResponse"><soap:body use="literal" /></wsdl:output>
+	</wsdl:operation>
+	
+	<wsdl:operation name="setConfiguration">
+		<soap:operation soapAction="setConfiguration" />
+		<wsdl:input name="SetConfigurationRequest"><soap:body use="literal" /></wsdl:input>
+		<wsdl:output name="SetConfigurationResponse"><soap:body use="literal" /></wsdl:output>
+	</wsdl:operation>
+
+	<wsdl:operation name="getHost">
+		<soap:operation soapAction="getHost" />
+		<wsdl:input name="GetHostRequest"><soap:body use="literal" /></wsdl:input>
+		<wsdl:output name="GetHostResponse"><soap:body use="literal" /></wsdl:output>
+	</wsdl:operation>
+	
+	<wsdl:operation name="getHostUsingName">
+		<soap:operation soapAction="getHostUsingName" />
+		<wsdl:input name="GetHostUsingNameRequest"><soap:body use="literal" /></wsdl:input>
+		<wsdl:output name="GetHostUsingNameResponse"><soap:body use="literal" /></wsdl:output>
+	</wsdl:operation>
+	
+	<wsdl:operation name="getHostList">
+		<soap:operation soapAction="getHostList" />
+		<wsdl:input name="GetHostListRequest"><soap:body use="literal" /></wsdl:input>
+		<wsdl:output name="GetHostListResponse"><soap:body use="literal" /></wsdl:output>
+	</wsdl:operation>
+
+	<wsdl:operation name="setHost">
+		<soap:operation soapAction="setHost" />
+		<wsdl:input name="SetHostRequest"><soap:body use="literal" /></wsdl:input>
+		<wsdl:output name="SetHostResponse"><soap:body use="literal" /></wsdl:output>
+	</wsdl:operation>
+	
+	<wsdl:operation name="delHost">
+		<soap:operation soapAction="delHost" />
+		<wsdl:input name="DelHostRequest"><soap:body use="literal" /></wsdl:input>
+		<wsdl:output name="DelHostResponse"><soap:body use="literal" /></wsdl:output>
+	</wsdl:operation>
+	
+	<wsdl:operation name="addHost">
+		<soap:operation soapAction="addHost" />
+		<wsdl:input name="AddHostRequest"><soap:body use="literal" /></wsdl:input>
+		<wsdl:output name="AddHostResponse"><soap:body use="literal" /></wsdl:output>
+	</wsdl:operation>
+ 	 
+	<wsdl:operation name="getStorage">
+		<soap:operation soapAction="getStorage" />
+		<wsdl:input name="GetStorageRequest"><soap:body use="literal" /></wsdl:input>
+		<wsdl:output name="GetStorageResponse"><soap:body use="literal" /></wsdl:output>
+	</wsdl:operation>
+	
+	<wsdl:operation name="getStorageList">
+		<soap:operation soapAction="getStorageList" />
+		<wsdl:input name="GetStorageListRequest"><soap:body use="literal" /></wsdl:input>
+		<wsdl:output name="GetStorageListResponse"><soap:body use="literal" /></wsdl:output>
+	</wsdl:operation>
+
+	<wsdl:operation name="setStorage">
+		<soap:operation soapAction="setStorage" />
+		<wsdl:input name="SetStorageRequest"><soap:body use="literal" /></wsdl:input>
+		<wsdl:output name="SetStorageResponse"><soap:body use="literal" /></wsdl:output>
+	</wsdl:operation>
+	
+	<wsdl:operation name="delStorage">
+		<soap:operation soapAction="delStorage" />
+		<wsdl:input name="DelStorageRequest"><soap:body use="literal" /></wsdl:input>
+		<wsdl:output name="DelStorageResponse"><soap:body use="literal" /></wsdl:output>
+	</wsdl:operation>
+	
+	<wsdl:operation name="addStorage">
+		<soap:operation soapAction="addStorage" />
+		<wsdl:input name="AddStorageRequest"><soap:body use="literal" /></wsdl:input>
+		<wsdl:output name="AddStorageResponse"><soap:body use="literal" /></wsdl:output>
+	</wsdl:operation>
+ 	 
+	<wsdl:operation name="getHostStorage">
+		<soap:operation soapAction="getHostStorage" />
+		<wsdl:input name="GetHostStorageRequest"><soap:body use="literal" /></wsdl:input>
+		<wsdl:output name="GetHostStorageResponse"><soap:body use="literal" /></wsdl:output>
+	</wsdl:operation>
+	
+	<wsdl:operation name="getHostStorageList">
+		<soap:operation soapAction="getHostStorageList" />
+		<wsdl:input name="GetHostStorageListRequest"><soap:body use="literal" /></wsdl:input>
+		<wsdl:output name="GetHostStorageListResponse"><soap:body use="literal" /></wsdl:output>
+	</wsdl:operation>
+
+	<wsdl:operation name="setHostStorage">
+		<soap:operation soapAction="setHostStorage" />
+		<wsdl:input name="SetHostStorageRequest"><soap:body use="literal" /></wsdl:input>
+		<wsdl:output name="SetHostStorageResponse"><soap:body use="literal" /></wsdl:output>
+	</wsdl:operation>
+	
+	<wsdl:operation name="delHostStorage">
+		<soap:operation soapAction="delHostStorage" />
+		<wsdl:input name="DelHostStorageRequest"><soap:body use="literal" /></wsdl:input>
+		<wsdl:output name="DelHostStorageResponse"><soap:body use="literal" /></wsdl:output>
+	</wsdl:operation>
+	
+	<wsdl:operation name="addHostStorage">
+		<soap:operation soapAction="addHostStorage" />
+		<wsdl:input name="AddHostStorageRequest"><soap:body use="literal" /></wsdl:input>
+		<wsdl:output name="AddHostStorageResponse"><soap:body use="literal" /></wsdl:output>
+	</wsdl:operation>
+ 	 
+    <wsdl:operation name="scheduleHostMaintenance">
+      	<soap:operation soapAction="scheduleHostMaintenance" />
+      	<wsdl:input name="ScheduleHostMaintenanceRequest"><soap:body use="literal" /></wsdl:input>
+      	<wsdl:output name="ScheduleHostMaintenanceResponse"><soap:body use="literal" /></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="cancelScheduledHostMaintenance">
+      	<soap:operation soapAction="cancelScheduledHostMaintenance" />
+      	<wsdl:input name="CancelScheduledHostMaintenanceRequest"><soap:body use="literal" /></wsdl:input>
+      	<wsdl:output name="CancelScheduledHostMaintenanceResponse"><soap:body use="literal" /></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="modifyScheduledHostMaintenance">
+      	<soap:operation soapAction="modifyScheduledHostMaintenance" />
+      	<wsdl:input name="ModifyScheduledHostMaintenanceRequest"><soap:body use="literal" /></wsdl:input>
+      	<wsdl:output name="ModifyScheduledHostMaintenanceResponse"><soap:body use="literal" /></wsdl:output>
+    </wsdl:operation>
+    
+    <wsdl:operation name="getHostMaintenanceAvailability">
+      	<soap:operation soapAction="getHostMaintenanceAvailability" />
+      	<wsdl:input name="GetHostMaintenanceAvailabilityRequest"><soap:body use="literal" /></wsdl:input>
+      	<wsdl:output name="GetHostMaintenanceAvailabilityResponse"><soap:body use="literal" /></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="getHostMaintenanceUnavailability">
+      	<soap:operation soapAction="getHostMaintenanceUnavailability" />
+      	<wsdl:input name="GetHostMaintenanceUnavailabilityRequest"><soap:body use="literal" /></wsdl:input>
+      	<wsdl:output name="GetHostMaintenanceUnavailabilityResponse"><soap:body use="literal" /></wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="getHostMaintenanceSchedule">
+      	<soap:operation soapAction="getHostMaintenanceSchedule" />
+      	<wsdl:input name="GetHostMaintenanceScheduleRequest"><soap:body use="literal" /></wsdl:input>
+      	<wsdl:output name="GetHostMaintenanceScheduleResponse"><soap:body use="literal" /></wsdl:output>
+    </wsdl:operation>
+
+  	</wsdl:binding>
+  
+  	<!-- ========= Services  ========= -->
+
+  	<wsdl:service name="VEScheduler">
+    	<wsdl:port name="VESchedulerPort" binding="tns:VESchedulerBinding">
+      		<soap:address location="http://localhost:8080/axis2/services/VEScheduler" />
+    	</wsdl:port>
+  	</wsdl:service>
+
+</wsdl:definitions>
+

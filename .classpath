@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="classes" path="src"/>
+	<classpathentry kind="var" path="JRE_LIB" sourcepath="JRE_SRC"/>
+	<classpathentry kind="con" path="/Users/sadjadi/Documents/Briefcase4Masoud/workspace3/vescheduler"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/virtuallabs"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/KaseyaTenant"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/kaseyawsclient"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
