@@ -125,7 +125,7 @@ public class VEScheduler { // extends VESchedulerSkeleton {
 	private String configFile = null;
 	
 	private VirtualLabsDB virtualLabsDB;
-	private VirtualLabsSettings vLabsSettings;
+	// private VirtualLabsSettings vLabsSettings;
 
 	private VESchedulerDB veSchDB;
 	private VESchedulerSettings settings;
@@ -152,19 +152,23 @@ public class VEScheduler { // extends VESchedulerSkeleton {
 	
 		DebugTools.println(DEBUG_LEVEL, "[VEScheduler - startUp] Inside!");
 		
+		virtualLabsDB = VirtualLabsDB.instance();
+		
+		/*
 		virtualLabsDB = new VirtualLabsDB();
 
 		vLabsSettings = VirtualLabsSettings.instance();
 			
 
-		DebugTools.println(DEBUG_LEVEL, "[VirtualLabs] Settings!" + vLabsSettings);
+		DebugTools.println(DEBUG_LEVEL, "[VEScheduler - startUp] vLabsSettings!" + vLabsSettings);
 
 		virtualLabsDB.connect(
 				vLabsSettings.getDbUser(), 
 				vLabsSettings.getDbPassword(), 
 				vLabsSettings.getDbHost(), 
 				vLabsSettings.getDbName());
-
+		*/
+		
 		veSchDB = VESchedulerDB.instance();
 		
 		settings= VESchedulerSettings.instance();
