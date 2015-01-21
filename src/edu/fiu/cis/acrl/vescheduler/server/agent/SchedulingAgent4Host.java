@@ -845,6 +845,19 @@ public class SchedulingAgent4Host extends Thread { // implements Runnable {
 						// String email = user.getEmailAddress();
 						String email = tenant.getUsername();
 						String password = user.getPassword();
+						// Changed by Masoud Sadjadi on Jan. 21, 2015
+						// To support no plaintext password
+						if (virtualLabsDB.isNoPlainTextPasswordInEffect4ThisUser(user.getUserName())) {
+							DebugTools.println(DEBUG_LEVEL, "[SchedulingAgent4Host - hostId " + this.hostId + " - executeTasks] " +
+									"isNoPlainTextPasswordInEffect4ThisUser(" + user.getUserName() + ") is true!");
+							password = kserver.getPassword();
+							DebugTools.println(DEBUG_LEVEL, "[SchedulingAgent4Host - hostId " + this.hostId + " - executeTasks] " +
+									"the password for the tenant to be created will be " + password);
+
+						} else {
+							DebugTools.println(DEBUG_LEVEL, "[SchedulingAgent4Host - hostId " + this.hostId + " - executeTasks] " +
+									"isNoPlainTextPasswordInEffect4ThisUser(" + user.getUserName() + ") is false!");
+						}
 						// String encPassword = "encPassword";
 						String language = "en-US";
 						AccountType accountType = AccountType.Tenant;
