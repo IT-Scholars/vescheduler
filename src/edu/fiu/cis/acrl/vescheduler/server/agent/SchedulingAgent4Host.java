@@ -639,6 +639,8 @@ public class SchedulingAgent4Host extends Thread { // implements Runnable {
 					continue;
 
 				User user = virtualLabsDB.getUser(t.getUsername());						
+				DebugTools.println(DEBUG_LEVEL, "[SchedulingAgent4Host - hostId " + this.hostId + " - executeTasks] " +
+						"the user is: " + user);
 				
 				VEInstance veIns = veSchDB.getVEInstance(t.getVeInsId());
 				Tenant tenant = veSchDB.getTenantByVeInsId(veIns.getId());
@@ -851,13 +853,13 @@ public class SchedulingAgent4Host extends Thread { // implements Runnable {
 							DebugTools.println(DEBUG_LEVEL, "[SchedulingAgent4Host - hostId " + this.hostId + " - executeTasks] " +
 									"isNoPlainTextPasswordInEffect4ThisUser(" + user.getUserName() + ") is true!");
 							password = kserver.getPassword();
-							DebugTools.println(DEBUG_LEVEL, "[SchedulingAgent4Host - hostId " + this.hostId + " - executeTasks] " +
-									"the password for the tenant to be created will be " + password);
 
 						} else {
 							DebugTools.println(DEBUG_LEVEL, "[SchedulingAgent4Host - hostId " + this.hostId + " - executeTasks] " +
 									"isNoPlainTextPasswordInEffect4ThisUser(" + user.getUserName() + ") is false!");
 						}
+						DebugTools.println(DEBUG_LEVEL, "[SchedulingAgent4Host - hostId " + this.hostId + " - executeTasks] " +
+								"the password for the tenant to be created will be " + password);
 						// String encPassword = "encPassword";
 						String language = "en-US";
 						AccountType accountType = AccountType.Tenant;
@@ -894,7 +896,11 @@ public class SchedulingAgent4Host extends Thread { // implements Runnable {
 								tenant.setCustomerID(tenantAccount.getCustomerID());
 								tenant.setEndDate(tenantAccount.getEndDate());
 								tenant.setGroup(tenantAccount.getGroup());
-								tenant.setPassword(tenantAccount.getPassword());
+								// SMS: Feb. 26, 2015
+								// Making sure that the password is set properly
+								// whether the no plain text password is enabled for this account or not.
+								// tenant.setPassword(tenantAccount.getPassword());
+								tenant.setPassword(password);
 								tenant.setUrl(tenantAccount.getUrl());
 								tenant.setUsername(tenantAccount.getUsername());
 								tenant.setKserverId(kserver.getId());
